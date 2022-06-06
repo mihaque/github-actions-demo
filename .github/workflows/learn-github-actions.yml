@@ -1,12 +1,20 @@
-name: learn-github-actions
-on: [push]
+name: Lint
+
+on:
+  push:
+    paths:
+      - '*.py'
+
 jobs:
-  check-bats-version:
+  flake8_py3:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: Setup Python
+        uses: actions/setup-python@v1
         with:
-          node-version: '14'
-      - run: npm install -g bats
-      - run: bats -v
+          python-version: 3.7.4
+          architecture: x64
+      - name: Checkout
+        uses: actions/checkout@main
+      - name: Install flake8
+        run: pip install flake8
