@@ -1,9 +1,9 @@
-name: Lint
+name: Lint Check
 
 on: [push]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
