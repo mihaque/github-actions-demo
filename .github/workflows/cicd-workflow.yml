@@ -1,0 +1,200 @@
+name: Helix-Deployment-Workflow
+'on':
+  workflow_dispatch:
+    inputs:
+      cloud_composer:
+        type: choice
+        description: cloud_composer
+        default: None
+        options:
+        - None
+        - Select All
+        - it-helix-platform-composer-dev
+      dataflow:
+        type: choice
+        description: dataflow
+        default: None
+        options:
+        - None
+        - Select All
+        - equinix-fabric-nokia
+        - equinix-connect
+        - equinix-connect-scudcu
+        - equinix-fabric
+        - equinix-internet-exchange
+      bigquery:
+        type: choice
+        description: bigquery
+        default: None
+        options:
+        - None
+        - Select All
+        - network
+jobs:
+  parse_github_event:
+    name: Parse GitHub Event
+    runs-on: helix-cicd-runners
+    steps:
+    - name: Parse Required Args from GitHub Event
+      id: parse_github_payload
+      env:
+        GC: ${{ toJson(github) }}
+      run: |
+        echo ::set-output name=EVENT_NAME::$(echo $GC | jq -r .event_name)
+        echo ::set-output name=DEV_INPUT::$(echo $GC | jq -r .event.inputs)
+        echo ::set-output name=COMMIT_IDS::$(echo $GC | jq -r .event.commits[].id)
+        echo ::set-output name=DEVOPS_REPO::equinix-enterpriseapps/analytics-Helix-github-action
+        echo ::set-output name=DEVOPS_BRANCH::main
+        echo ::set-output name=SOURCE_REPO::$(echo $GC | jq -r .repository)
+        echo ::set-output name=SOURCE_BRANCH::$(echo $GC | jq -r .ref_name)
+        echo ::set-output name=SOURCE_SHA::$(echo $GC | jq -r .sha)
+#        if [ $(echo $GC | jq -r .ref_name) == "main" || $(echo $GC | jq -r .ref_name) == "master" ]; then
+#           echo ::set-output name=DEPLOYMENT_ENVIRONMENT::prod
+#        else
+#           echo ::set-output name=DEPLOYMENT_ENVIRONMENT::$(echo $GC | jq -r .ref_name)
+#        fi
+#    outputs:
+#      EVENT_NAME: ${{ steps.parse_github_payload.outputs.EVENT_NAME }}
+#      DEV_INPUT: ${{ steps.parse_github_payload.outputs.DEV_INPUT }}
+#      COMMIT_IDS: ${{ steps.parse_github_payload.outputs.COMMIT_IDS }}
+#      DEVOPS_REPO: ${{ steps.parse_github_payload.outputs.DEVOPS_REPO }}
+#      DEVOPS_BRANCH: ${{ steps.parse_github_payload.outputs.DEVOPS_BRANCH }}
+#      SOURCE_REPO: ${{ steps.parse_github_payload.outputs.SOURCE_REPO }}
+#      SOURCE_BRANCH: ${{ steps.parse_github_payload.outputs.SOURCE_BRANCH }}
+#      SOURCE_SHA: ${{ steps.parse_github_payload.outputs.SOURCE_SHA }}
+#      DEPLOYMENT_ENVIRONMENT: ${{ steps.parse_github_payload.outputs.DEPLOYMENT_ENVIRONMENT }}
+
+#  find_deployment_components:
+#    name: Find Components for Deployment
+#    runs-on: helix-cicd-runners
+#    environment:
+#      name: ${{ needs.parse_github_event.outputs.DEPLOYMENT_ENVIRONMENT }}
+#    needs: parse_github_event
+#    steps:
+#    - name: Set Repository Workspace
+#      id: set_repo_workspace
+#      run: |
+#        echo ::set-output name=SOURCE_REPO_WORKSPACE::$GITHUB_WORKSPACE/${{ needs.parse_github_event.outputs.SOURCE_REPO }}
+#        echo ::set-output name=DEVOPS_REPO_WORKSPACE::$GITHUB_WORKSPACE/${{ needs.parse_github_event.outputs.DEVOPS_REPO }}
+#
+#    - name: Cleanup Workspace
+#      run: |
+#        rm -rf ${{ steps.set_repo_workspace.outputs.SOURCE_REPO_WORKSPACE }}
+#        rm -rf ${{ steps.set_repo_workspace.outputs.DEVOPS_REPO_WORKSPACE }}
+#
+#    - name: Clone Source Repository
+#      uses: actions/checkout@v3
+#      with:
+#        fetch-depth: '0'
+#        ref: ${{ needs.parse_github_event.outputs.SOURCE_BRANCH }}
+#        repository: ${{ needs.parse_github_event.outputs.SOURCE_REPO }}
+#        token: ${{ secrets.GH_SA_ACCESS_TOKEN }}
+#        path: ./${{ needs.parse_github_event.outputs.SOURCE_REPO }}
+#
+#    - name: Clone DevOps Repository
+#      uses: actions/checkout@v3
+#      with:
+#        fetch-depth: '0'
+#        ref: ${{ needs.parse_github_event.outputs.DEVOPS_BRANCH }}
+#        repository: ${{ needs.parse_github_event.outputs.DEVOPS_REPO }}
+#        token: ${{ secrets.GH_SA_ACCESS_TOKEN }}
+#        path: ./${{ needs.parse_github_event.outputs.DEVOPS_REPO }}
+#
+#    - name: Prerequisites Checks on Deployment File
+#      env:
+#        SOURCE_BRANCH: ${{ needs.parse_github_event.outputs.SOURCE_BRANCH }}
+#        SOURCE_REPO_WORKSPACE: ${{ steps.set_repo_workspace.outputs.SOURCE_REPO_WORKSPACE }}
+#        DEVOPS_REPO_WORKSPACE: ${{ steps.set_repo_workspace.outputs.DEVOPS_REPO_WORKSPACE }}
+#      run: python3 $DEVOPS_REPO_WORKSPACE/shared_libs/scripts/workflow_scripts/deployment_prereqs_check.py $SOURCE_REPO_WORKSPACE $SOURCE_BRANCH
+#
+#    - name: Parse Deployment JSON File
+#      id: parse_deployment_json
+#      env:
+#        SOURCE_BRANCH: ${{ needs.parse_github_event.outputs.SOURCE_BRANCH }}
+#        SOURCE_REPO_WORKSPACE: ${{ steps.set_repo_workspace.outputs.SOURCE_REPO_WORKSPACE }}
+#        DEVOPS_REPO_WORKSPACE: ${{ steps.set_repo_workspace.outputs.DEVOPS_REPO_WORKSPACE }}
+#        COMMIT_IDS: ${{ needs.parse_github_event.outputs.COMMIT_IDS }}
+#        EVENT_NAME: ${{ needs.parse_github_event.outputs.EVENT_NAME }}
+#        DEV_INPUT: ${{ needs.parse_github_event.outputs.DEV_INPUT }}
+#      run: |
+#        if [ $EVENT_NAME == "workflow_dispatch" ]; then
+#            python3 $DEVOPS_REPO_WORKSPACE/shared_libs/scripts/workflow_scripts/parse_developer_input.py "$DEV_INPUT" $SOURCE_REPO_WORKSPACE $SOURCE_BRANCH
+#        else
+#            python3 $DEVOPS_REPO_WORKSPACE/shared_libs/scripts/workflow_scripts/parse_developer_commit.py "$COMMIT_IDS" $SOURCE_REPO_WORKSPACE $SOURCE_BRANCH
+#        fi
+#        echo ::set-output name=DEPLOYMENT_COMPONENTS::$(cat $SOURCE_REPO_WORKSPACE/temp_deployment/to_deploy.json)
+#        echo ::set-output name=DEPLOYMENT_COMPONENT_TYPES::$(cat $SOURCE_REPO_WORKSPACE/temp_deployment/to_deploy.json | jq -r 'keys')
+#
+#    outputs:
+#      SOURCE_REPO_WORKSPACE: ${{ steps.set_repo_workspace.outputs.SOURCE_REPO_WORKSPACE }}
+#      DEVOPS_REPO_WORKSPACE: ${{ steps.set_repo_workspace.outputs.DEVOPS_REPO_WORKSPACE }}
+#      DEPLOYMENT_COMPONENTS: ${{ steps.parse_deployment_json.outputs.DEPLOYMENT_COMPONENTS }}
+#      DEPLOYMENT_COMPONENT_TYPES: ${{ steps.parse_deployment_json.outputs.DEPLOYMENT_COMPONENT_TYPES }}
+#
+#
+#  dataflow_deployment:
+#    name: Dataflow Deployment
+#    needs: [ parse_github_event, find_deployment_components ]
+#    if: contains(fromJSON(needs.find_deployment_components.outputs.DEPLOYMENT_COMPONENT_TYPES), 'dataflow')
+#    uses: ./.github/workflows/helix-reusablewf-dataflow-deployment.yml
+#    with:
+#      SOURCE_BRANCH: ${{ needs.parse_github_event.outputs.SOURCE_BRANCH }}
+#      SOURCE_REPO: ${{ needs.parse_github_event.outputs.SOURCE_REPO }}
+#      DEPLOYMENT_COMPONENTS: ${{ needs.find_deployment_components.outputs.DEPLOYMENT_COMPONENTS }}
+#      DEPLOYMENT_ENVIRONMENT: ${{ needs.parse_github_event.outputs.DEPLOYMENT_ENVIRONMENT }}
+#    secrets: inherit
+#
+#
+#  cloud_composer_deployment:
+#    name: CloudComposer Deployment
+#    needs: [ parse_github_event, find_deployment_components ]
+#    if: contains(fromJSON(needs.find_deployment_components.outputs.DEPLOYMENT_COMPONENT_TYPES), 'cloud_composer')
+#    uses: ./.github/workflows/helix-reusablewf-cloudcomposer-deployment.yml
+#    with:
+#      SOURCE_BRANCH: ${{ needs.parse_github_event.outputs.SOURCE_BRANCH }}
+#      SOURCE_REPO: ${{ needs.parse_github_event.outputs.SOURCE_REPO }}
+#      DEPLOYMENT_COMPONENTS: ${{ needs.find_deployment_components.outputs.DEPLOYMENT_COMPONENTS }}
+#      DEPLOYMENT_ENVIRONMENT: ${{ needs.parse_github_event.outputs.DEPLOYMENT_ENVIRONMENT }}
+#    secrets: inherit
+#
+#
+#  cloud_function_deployment:
+#    name: CloudFunction Deployment
+#    needs: [ parse_github_event, find_deployment_components ]
+#    if: contains(fromJSON(needs.find_deployment_components.outputs.DEPLOYMENT_COMPONENT_TYPES), 'cloud_function')
+#    uses: ./.github/workflows/helix-reusablewf-cloudfunction-deployment.yml
+#    with:
+#      SOURCE_BRANCH: ${{ needs.parse_github_event.outputs.SOURCE_BRANCH }}
+#      SOURCE_REPO: ${{ needs.parse_github_event.outputs.SOURCE_REPO }}
+#      DEPLOYMENT_COMPONENTS: ${{ needs.find_deployment_components.outputs.DEPLOYMENT_COMPONENTS }}
+#      DEPLOYMENT_ENVIRONMENT: ${{ needs.parse_github_event.outputs.DEPLOYMENT_ENVIRONMENT }}
+#    secrets: inherit
+#
+#
+#  bigquery_deployment:
+#    name: BigQuery Deployment
+#    needs: [ parse_github_event, find_deployment_components ]
+#    if: contains(fromJSON(needs.find_deployment_components.outputs.DEPLOYMENT_COMPONENT_TYPES), 'bigquery')
+#    uses: ./.github/workflows/helix-reusablewf-bigquery-deployment.yml
+#    with:
+#      SOURCE_BRANCH: ${{ needs.parse_github_event.outputs.SOURCE_BRANCH }}
+#      SOURCE_REPO: ${{ needs.parse_github_event.outputs.SOURCE_REPO }}
+#      DEPLOYMENT_COMPONENTS: ${{ needs.find_deployment_components.outputs.DEPLOYMENT_COMPONENTS }}
+#      DEPLOYMENT_ENVIRONMENT: ${{ needs.parse_github_event.outputs.DEPLOYMENT_ENVIRONMENT }}
+#    secrets: inherit
+#
+#
+#  appengine_deployment:
+#    name: AppEngine Deployment
+#    needs: [ parse_github_event, find_deployment_components ]
+#    if: contains(fromJSON(needs.find_deployment_components.outputs.DEPLOYMENT_COMPONENT_TYPES), 'appengine')
+#    uses: ./.github/workflows/helix-reusablewf-appengine-deployment.yml
+#    with:
+#      SOURCE_BRANCH: ${{ needs.parse_github_event.outputs.SOURCE_BRANCH }}
+#      SOURCE_REPO: ${{ needs.parse_github_event.outputs.SOURCE_REPO }}
+#      SOURCE_SHA: ${{ needs.parse_github_event.outputs.SOURCE_SHA }}
+#      DEPLOYMENT_COMPONENTS: ${{ needs.find_deployment_components.outputs.DEPLOYMENT_COMPONENTS }}
+#      DEPLOYMENT_ENVIRONMENT: ${{ needs.parse_github_event.outputs.DEPLOYMENT_ENVIRONMENT }}
+#    secrets: inherit
+
+#EOF
