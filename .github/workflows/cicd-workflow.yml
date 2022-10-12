@@ -41,13 +41,13 @@ jobs:
         GC: ${{ toJson(github) }}
       run: |
         echo ::set-output name=EVENT_NAME::$(echo $GC | jq -r .event_name)
-        echo ::set-output name=DEV_INPUT::$(echo $GC | jq -r .event.inputs)
-        echo ::set-output name=COMMIT_IDS::$(echo $GC | jq -r .event.commits[].id)
-        echo ::set-output name=DEVOPS_REPO::equinix-enterpriseapps/analytics-Helix-github-action
-        echo ::set-output name=DEVOPS_BRANCH::main
-        echo ::set-output name=SOURCE_REPO::$(echo $GC | jq -r .repository)
-        echo ::set-output name=SOURCE_BRANCH::$(echo $GC | jq -r .ref_name)
-        echo ::set-output name=SOURCE_SHA::$(echo $GC | jq -r .sha)
+ #       echo ::set-output name=DEV_INPUT::$(echo $GC | jq -r .event.inputs)
+ #       echo ::set-output name=COMMIT_IDS::$(echo $GC | jq -r .event.commits[].id)
+ #       echo ::set-output name=DEVOPS_REPO::equinix-enterpriseapps/analytics-Helix-github-action
+ #       echo ::set-output name=DEVOPS_BRANCH::main
+ #       echo ::set-output name=SOURCE_REPO::$(echo $GC | jq -r .repository)
+ #       echo ::set-output name=SOURCE_BRANCH::$(echo $GC | jq -r .ref_name)
+ #       echo ::set-output name=SOURCE_SHA::$(echo $GC | jq -r .sha)
 #        if [ $(echo $GC | jq -r .ref_name) == "main" || $(echo $GC | jq -r .ref_name) == "master" ]; then
 #           echo ::set-output name=DEPLOYMENT_ENVIRONMENT::prod
 #        else
