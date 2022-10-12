@@ -33,7 +33,7 @@ name: Helix-Deployment-Workflow
 jobs:
   parse_github_event:
     name: Parse GitHub Event
-    runs-on: helix-cicd-runners
+    runs-on: ubuntu-latest
     steps:
     - name: Parse Required Args from GitHub Event
       id: parse_github_payload
