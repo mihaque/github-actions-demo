@@ -1,4 +1,4 @@
-name: Helix-Deployment-Workflow
+name: HELIX
 'on':
   workflow_dispatch:
     inputs:
