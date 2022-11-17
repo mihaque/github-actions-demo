@@ -5,7 +5,18 @@ on: [push]
 #    paths:
 #      - '*.py'
 
+env:
+  DAY_OF_WEEK: Monday
+
 jobs:
+
+  check_env:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "print day of the week"
+        run: |
+          echo $DAY_OF_WEEK
+
   flake8:
     runs-on: ubuntu-latest
     steps:
