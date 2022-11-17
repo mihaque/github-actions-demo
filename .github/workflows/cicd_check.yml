@@ -7,7 +7,6 @@ on: [push]
 
 env:
   DAY_OF_WEEK: Monday
-  FILE_NAME_SUFFIX: txt
 
 jobs:
 
@@ -16,11 +15,10 @@ jobs:
     steps:
       - name: "print day of the week"
         run: |
-          echo $DAY_OF_WEEK
-          mkdir example
-          echo "hello" > example/say_hello.txt
-          cd example
-          cat say_hello."$FILE_NAME_SUFFIX"
+          export day='$DAY_OF_WEEK'
+          echo $day
+
+          
 
   flake8:
     runs-on: ubuntu-latest
