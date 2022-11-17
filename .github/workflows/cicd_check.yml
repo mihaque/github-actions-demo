@@ -17,8 +17,8 @@ jobs:
         run: |
           export day='$DAY_OF_WEEK'
           echo $day
-
-          
+          export day2=$DAY_OF_WEEK
+          echo $day2
 
   flake8:
     runs-on: ubuntu-latest
