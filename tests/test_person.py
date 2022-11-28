@@ -10,3 +10,7 @@ class TestPerson:
         personal_details = p1.get_personal_details()
         assert personal_details["name"] == "mih"
         assert personal_details["age"] == 29
+        
+    def test_day(self):
+        import os
+        assert os.environ['DAY_OF_WEEK'] == 'Monday':
