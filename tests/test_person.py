@@ -13,4 +13,4 @@ class TestPerson:
         
     def test_day(self):
         import os
-        assert os.environ['DAY_OF_WEEK'] == 'Monday'
+        assert os.environ['DAY_OF_WEEK'] == 'TUE'
