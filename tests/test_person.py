@@ -21,6 +21,6 @@ class TestPerson:
         commit_msg = os.environ['PR_BODY']
         return commit_msg.split(',')
     
-    
-    def test_pr_content('file', get_modified_files()):
+    @pytest.mark.parameterize('file', get_modified_files())
+    def test_pr_content(file):
         assert 'success' in file
