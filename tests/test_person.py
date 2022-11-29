@@ -1,5 +1,5 @@
 from person import Person
-
+import os
 
 class TestPerson:
     def __int__(self):
@@ -12,5 +12,15 @@ class TestPerson:
         assert personal_details["age"] == 29
         
     def test_day(self):
-        import os
+        
         assert os.environ['DAY_OF_WEEK'] == 'TUE'
+    
+    @staticmethod
+    def get_modified_files():
+        
+        commit_msg = os.environ['PR_BODY']
+        return commit_msg.split(',')
+    
+    
+    def test_pr_content('file', get_modified_files()):
+        assert 'success' in file
