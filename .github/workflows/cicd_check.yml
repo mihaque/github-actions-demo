@@ -11,15 +11,15 @@ env:
 
 jobs:
 
-  check_env:
-    runs-on: ubuntu-latest
-    steps:
-      - name: "print day of the week"
-        run: |
-          export day='$DAY_OF_WEEK'
-          echo $day
-          export day2=$DAY_OF_WEEK
-          echo $day2
+#   check_env:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: "print day of the week"
+#         run: |
+#           export day='$DAY_OF_WEEK'
+#           echo $day
+#           export day2=$DAY_OF_WEEK
+#           echo $day2
 
   flake8:
     runs-on: ubuntu-latest
