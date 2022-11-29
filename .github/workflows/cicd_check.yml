@@ -6,6 +6,7 @@ on: [push]
 #      - '*.py'
 
 env:
+  PR_BODY: ${{ github.event.pull_request.body }} 
   DAY_OF_WEEK: Monday
 
 jobs:
