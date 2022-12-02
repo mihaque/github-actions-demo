@@ -9,18 +9,12 @@ on:
 
 #     types: [closed]
 
-env:
-  COMPOSER_BUCKET: gs://us-central1-analytics-compo-ad2ccaf9-bucket
-  STORAGE_PROJECT: analytics-plp-prod
-  PR_BODY: ${{ github.event.pull_request.body }}
-  GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.ANALYTICS_ADMIN_PROD_SA_JSON }}
-
 jobs:
 
   deploy_into_gcp:
-    runs-on: ['self-hosted', 'Linux', 'X64', 'pca-devops-prod']
+    runs-on: ubuntu-latest
 
-    if: github.event.pull_request.merged == true
+
 
     steps:
 
