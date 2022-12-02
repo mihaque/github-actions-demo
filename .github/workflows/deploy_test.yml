@@ -2,12 +2,12 @@ name: PROD
 on:
   push:
     branches: [ main ]
-    paths:
-      - 'composer/**'
-      - 'bigquery/**'
-      - 'dataflow/**'
+#     paths:
+#       - 'composer/**'
+#       - 'bigquery/**'
+#       - 'dataflow/**'
 
-    types: [closed]
+#     types: [closed]
 
 env:
   COMPOSER_BUCKET: gs://us-central1-analytics-compo-ad2ccaf9-bucket
